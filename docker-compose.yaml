@@ -1,0 +1,7 @@
+version: "3"
+services:
+  hello-2048:
+    image: hello-2048
+    build: .
+    ports:
+      - "80:80"
