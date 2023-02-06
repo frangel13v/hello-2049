@@ -4,5 +4,4 @@ services:
     image: hello-2048
     build: .
     ports:
-      - "80:80"
-      - "8080:8080"
+      - "8055:8055"
