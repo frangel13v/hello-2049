@@ -10,7 +10,6 @@ pipeline {
                     sh 'mkdir test'
                     sh 'ls'
                 }
-                      // docker pull ghcr.io/2000ghz/hello-2048/hello-2048:v1
 		  }
             }
         }
