@@ -5,13 +5,17 @@ pipeline {
           
         stage('Build') {
             steps {
-                sh 'docker-compose build'
+                sshagent(['amazon ec2 ssh']) {
+                      docker pull ghcr.io/2000ghz/hello-2048/hello-2048:v1
+		  }
             }
         }
             
         stage('Deploy') {
             steps {
-                sh 'docker-compose up -d'
+              sshagent(['amazon ec2 ssh']) {
+                      docker run ghcr.io/2000ghz/hello-2048/hello-2048:v1
+                        }  
             }    
         }
     }
