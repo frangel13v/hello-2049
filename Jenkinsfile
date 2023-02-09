@@ -9,7 +9,7 @@ pipeline {
 
         stage('Cleanup') {
             steps {
-                sh 'docker prune -a --volumes --force'
+                sh 'docker system prune -a --volumes --force'
             }
         }
 
