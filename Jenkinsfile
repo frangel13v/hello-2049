@@ -16,11 +16,12 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sshagent(['estoyaburrido']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'estoyaburrido', keyFileVariable: '')]) {
                     sh """
                         ssh -o "StrictHostKeyChecking no" ec2-user@52.49.48.142 whoami
                     """
-                }
+                    }
+                
             }
         }
     
