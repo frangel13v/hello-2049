@@ -2,15 +2,34 @@ pipeline {
     agent any
 
     stages {
-          
-        stage('Test') {
+
+        stage('Build'){
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'Amazon EC2', keyFileVariable: 'AWS_KEY')]) {
-                    sh 'ssh -o -tt -i $AWS_KEY ec2-user@52.49.48.142'
-                    sh 'docker pull ghcr.io/2000ghz/hello-2048/hello-2048:v1'
-                    sh 'docker run -d --rm -p 80:80  docker pull ghcr.io/2000ghz/hello-2048/hello-2048:v1'
+                sh ''
+            }
+        
+
+        stage('Package'){
+            steps {
+                withCredentials([string(credentialsId: 'Token-GitHub', variable: 'CR_PAT')]) {
+                    sh 'echo $CR_PAT | docker login ghcr.io -u 2000ghz --password-stdin'
+                    }
+                }
+            }
+
+
+
+
+
+        stage('Deploy') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'Amazon EC2', keyFileVariable: '')]) {
+                    sh 'ssh ec2-user@52.49.48.142 id'
+
+
                 }
 		  }
             }
         }
 }
+
