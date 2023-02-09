@@ -39,9 +39,9 @@ pipeline {
         }
 
         stage ('Push Image') {
+            steps {
             sh 'docker push ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'
+            }
         }
-
-
     }
 }
