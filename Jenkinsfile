@@ -13,7 +13,7 @@ pipeline {
                     sh "echo $CR_PAT | docker login ghcr.io -u 2000GHz --password-stdin"
                     sh "docker build -t ghcr.io/2000ghz/hello-2048/hello-2048:latest ."
                     sh "docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest"
-                    sh "docker-compose push"
+                    sh "docker-compose push ghcr.io/2000ghz/hello-2048/hello-2048:latest"
                 }
             }
         }
