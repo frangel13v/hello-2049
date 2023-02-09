@@ -16,9 +16,10 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sshagent(['Hello2048EC2']) {
+                
+                withCredentials([sshUserPrivateKey(credentialsId: 'Hello2048EC2', keyFileVariable: '')]) {
                     sh """
-                        ssh -o "StrictHostKeyChecking no" ec2-52-49-48-142.eu-west-1.compute.amazonaws.com id
+                        52-4ssh -o "StrictHostKeyChecking no" ec2-9-48-142.eu-west-1.compute.amazonaws.com id
                     """
                 }
             }
