@@ -17,13 +17,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'docker-compose build'
+                sh 'docker-compose build -t latest'
             }
         }
 
         stage('Push') {
             steps {
-                sh 'docker push ghcr.io/2000ghz/hello-2048/'
+                sh 'docker push latest'
             }
         }
 
