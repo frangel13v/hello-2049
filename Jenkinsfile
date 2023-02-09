@@ -7,8 +7,7 @@ pipeline {
 
     environment {
         GITHUB_TOKEN=credentials('github-token')
-        IMAGE_NAME='2000ghz/hello-2048/hello-2048'
-        IMAGE_VERSION='${BUILD_NUMBER}'
+        IMAGE_NAME='hello-2048'
     }
 
     stages {
@@ -22,7 +21,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building image...'
-                sh 'docker build -t $IMAGE_NAME:$IMAGE_VERSION .'
+                sh 'docker build -t $IMAGE_NAME:${BUILD_NUMBER} .'
             }
         }
 
