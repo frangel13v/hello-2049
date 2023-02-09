@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Login') {
             steps {
-                withCredentials([string(credentialsId: 'github-token', variable: 'CR_PAT')]) {
+                withCredentials([string(credentialsId: 'Token-GitHub', variable: 'CR_PAT')]) {
                     sh "echo $CR_PAT | docker login ghcr.io -u 2000GHz --password-stdin"
                 }
             }
