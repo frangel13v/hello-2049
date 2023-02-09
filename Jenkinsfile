@@ -17,7 +17,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'docker-compose build -t latest'
+                sh 'docker build -t latest'
             }
         }
 
