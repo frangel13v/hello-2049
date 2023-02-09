@@ -18,7 +18,8 @@ pipeline {
             steps {
                 sshagent(['estoyaburrido']) {
                     sh """
-                        ssh -o "StrictHostKeyChecking no" ec2-user@52.49.48.142 whoami
+                        ssh -o "StrictHostKeyChecking no" ec2-user@52.49.48.142
+                        whoami
                     """
                 }
             }
