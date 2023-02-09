@@ -17,8 +17,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent(['estoyaburrido']) {
+                    steps {
+                        sh "ssh -o "StrictHostKeyChecking no" ec2-user@52.49.48.142 'whomai'"
+                    }
                     
-                    sh "ssh -o "StrictHostKeyChecking no" ec2-user@52.49.48.142 'whomai'"
 
                 }
             }
