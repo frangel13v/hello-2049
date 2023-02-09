@@ -15,7 +15,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent(['Amazon EC2']) {
-                    sh 'date'
+                    sh 'ssh -o "StrictHostKeyChecking no" ec2-user@52.49.48.142 date'
                 }
             }
         }
