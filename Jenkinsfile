@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    options {
+        timestamps()
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -16,12 +20,10 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sshagent(['estoyaburrido']) {
-                    steps {
-                        sh "ssh -o "StrictHostKeyChecking no" ec2-user@52.49.48.142"
-                    }
-                    
-
+                sshagent(['ssh-amazon']) {
+                    sh """
+                        ssh -o "StrictHostKeyChecking no" ec2-user@ec2-52-49-48-142.eu-west-1.compute.amazonaws.com id
+                    """
                 }
             }
         }
