@@ -19,7 +19,7 @@ pipeline {
                 
                 withCredentials([sshUserPrivateKey(credentialsId: 'Hello2048EC2', keyFileVariable: 'AWSKey')]) {
                     sh """
-                        ssh -o "StrictHostKeyChecking no" -i $AWSKey ec2-user@52.49.48.142 id
+                        ssh -o "StrictHostKeyChecking no" -i "$AWSKey" ec2-user@52.49.48.142 id
                     """
                 }
             }
