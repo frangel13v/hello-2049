@@ -17,7 +17,7 @@ pipeline {
                 sh "docker tag ghcr.io/2000ghz/hello-2048:latest ghcr.io/2000ghz/hello-2048:1.0.${BUILD_NUMBER}"
                 }
             }
-        }
+        
 
         stage('Deploy') {
             steps {
@@ -28,3 +28,4 @@ pipeline {
             }
         } 
     }
+}
