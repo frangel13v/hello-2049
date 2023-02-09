@@ -23,7 +23,7 @@ pipeline {
 
         stage('Push') {
             steps {
-                sh 'docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest'
+                sh 'docker push ghcr.io/2000ghz/hello-2048/hello2048'
             }
         }
 
