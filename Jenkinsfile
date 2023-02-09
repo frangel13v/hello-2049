@@ -21,6 +21,11 @@ pipeline {
             }
         }
 
+        stage('Push') {
+            steps {
+                sh 'docker push'
+            }
+        }
 
         stage('Deploy') {
             steps {
