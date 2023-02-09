@@ -33,7 +33,7 @@ pipeline {
 
         stage('Tag Image') {
             steps {
-                sh 'docker tag 2000ghz/hello-2048/:${BUILD_NUMBER} ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'
+                sh 'docker tag hello-2048:${BUILD_NUMBER} ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'
             }
         }
 
