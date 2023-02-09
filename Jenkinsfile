@@ -12,7 +12,7 @@ pipeline {
                 sh 'docker-compose build'
                 sh "git tag 1.0.${BUILD_NUMBER}"
                 withCredentials([sshUserPrivateKey(credentialsId: '5de78dd1-8b5a-4339-8706-1ae8919e1c03', keyFileVariable: '')]) {
-                    ssh "git push --tags"
+                    sh "git push --tags"
                 }
                 sh "docker tag ghcr.io/2000ghz/hello-2048:latest ghcr.io/2000ghz/hello-2048:1.0.${BUILD_NUMBER}"
                 }
