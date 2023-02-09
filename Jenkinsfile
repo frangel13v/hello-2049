@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         GITHUB_TOKEN=credentials('github-token')
-        IMAGE_NAME='hello-2048'
+        IMAGE_NAME='2000ghz/hello-2048/hello-2048'
         IMAGE_VERSION='${BUILD_NUMBER}'
     }
 
