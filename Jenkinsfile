@@ -38,12 +38,13 @@ pipeline {
     }
     }
 
-    stage('SSH') {
-        steps{
-            sshagent(['ssh-amazon']) {
-                    sh 'ssh -o "StrictHostKeyChecking=no" ec2-user@52.49.48.142 docker pull ghcr.io/2000ghz/hello-2048/hello-2048 && docker run -d --rm -p 80:80  docker pull ghcr.io/2000ghz/hello-2048/hello-2048:v1'
-                    }
-        }
+    stage('Deploy') {
+            steps {
+                sshagent(['ssh-amazon']) {
+                    sh 'ssh -o "StrictHostKeyChecking no" ec2-user@ec2-52-49-48-142.eu-west-1.compute.amazonaws.com "docker pull ghcr.io/2000ghz/hello-2048/hello-2048 && docker run -td --rm -p 80:80 ghcr.io/2000ghz/hello-2048/hello-2048"' 
+                    
+                }
+            }
     }
-    }
+}
 }
