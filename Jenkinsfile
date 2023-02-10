@@ -7,13 +7,6 @@ pipeline {
 
     stages {
 
-        stage('Cleanup') {
-            steps {
-                echo 'Cleaning system...'
-                sh 'docker system prune -a --volumes --force'
-            }
-        }
-
         stage('Build') {
             steps {
                 echo 'Building image...'
