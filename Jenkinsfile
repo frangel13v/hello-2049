@@ -36,7 +36,16 @@ pipeline {
             sh 'docker push ghcr.io/2000ghz/hello-2048/hello-2048:1.0.${BUILD_NUMBER}'
         }
     }
-}
+    }
+
+    stage('SSH') {
+        steps{
+            withCredentials([sshUserPrivateKey(credentialsId: 'ssh-amazon', keyFileVariable: 'AWS_KEY')]) {
+                    sh 'ssh -o -tt -i $AWS_KEY ec2-user@52.49.48.142'
+                    sh 'docker pull ghcr.io/2000ghz/hello-2048/hello-2048'
+                    sh 'docker run -d --rm -p 80:80  docker pull ghcr.io/2000ghz/hello-2048/hello-2048:v1'
+        }
+    }
 
 
     }
