@@ -5,15 +5,11 @@ pipeline {
         timestamps()
     }
 
-    environment {
-        GITHUB_TOKEN=credentials('github-token')
-        IMAGE_NAME='hello-2048'
-    }
-
     stages {
 
         stage('Cleanup') {
             steps {
+                echo 'Cleaning system...'
                 sh 'docker system prune -a --volumes --force'
             }
         }
@@ -21,26 +17,26 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building image...'
-                sh 'docker build -t $IMAGE_NAME:${BUILD_NUMBER} .'
+                sh '''docker-compose build 
+                      git tag 1.0.${BUILD_NUMBER}
+                      docker tag ghcr.io/2000ghz/hello-2048/hello2048:latest ghcr.io/2000ghz/hello-2048/hello2048:1.0.${BUILD_NUMBER}
+                      '''
+                      sshagent(['github-credentials']) {
+                        sh('git push git@github.com:2000ghz/hello-2048.git --tags')
+                      }
             }
         }
 
         stage('Login') {
             steps{
-                sh 'echo $GITHUB_TOKEN_PSW | docker login ghcr.io -u 2000ghz --password-stdin'
+                echo 'Logging into GitHub'
+                withCredentials([sshUserPrivateKey(credentialsId: 'github-credentials', keyFileVariable: 'GITHUB_TOKEN ')]) {
+                    sh 'echo $GITHUB_TOKEN | docker login ghcr.io -u 2000ghz --password-stdin'
+                    sh 'docker push ghcr.io/2000ghz/hello-2048/hello2048:1.0.${BUILD_NUMBER}'
+                }
+        
             }
         }
 
-        stage('Tag Image') {
-            steps {
-                sh 'docker tag hello-2048:${BUILD_NUMBER} ghcr.io/2000ghz/hello-2048/$IMAGE_NAME:$IMAGE_VERSION'
-            }
-        }
-
-        stage ('Push Image') {
-            steps {
-            sh 'docker push ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'
-            }
-        }
     }
 }
