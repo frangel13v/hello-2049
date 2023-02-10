@@ -32,7 +32,7 @@ pipeline {
             steps{
                 echo 'Logging into GitHub'
                 withCredentials([sshUserPrivateKey(credentialsId: 'github-credentials', keyFileVariable: 'GITHUB_TOKEN ')]) {
-                    sh -o "echo $GITHUB_TOKEN | StrictHostKeyChecking=no | docker login ghcr.io -u 2000ghz --password-stdin"
+                    sh -c "echo $GITHUB_TOKEN | docker login ghcr.io -u 2000ghz --password-stdin"
                     sh 'docker push ghcr.io/2000ghz/hello-2048/hello2048:1.0.${BUILD_NUMBER}'
                 }
         
