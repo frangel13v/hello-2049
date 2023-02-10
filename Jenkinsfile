@@ -31,7 +31,7 @@ pipeline {
         stage('Login') {
     steps{
         echo 'Logging into GitHub'
-        withCredentials([string(credentialsId: 'github-credentials', variable: 'GITHUB_TOKEN')]) {
+        withCredentials([string(credentialsId: 'Token-GitHub', variable: '')]) {
             sh 'echo $GITHUB_TOKEN | docker login ghcr.io -u 2000ghz --password-stdin'
             sh 'docker push ghcr.io/2000ghz/hello-2048/hello2048:1.0.${BUILD_NUMBER}'
         }
