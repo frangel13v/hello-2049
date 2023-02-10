@@ -20,7 +20,7 @@ pipeline {
                 sh '''docker-compose build
                       docker pull ghcr.io/2000ghz/hello-2048/hello-2048:latest
                       git tag 1.0.${BUILD_NUMBER}
-                      docker tag ghcr.io/2000ghz/hello-2048/hello-2048:latest ghcr.io/2000ghz/hello-2048/hello2048:1.0.${BUILD_NUMBER}
+                      docker tag ghcr.io/2000ghz/hello-2048/hello-2048:latest ghcr.io/2000ghz/hello-2048/hello-2048:1.0.${BUILD_NUMBER}
                       '''
                       sshagent(['github-credentials']) {
                         sh('git push git@github.com:2000ghz/hello-2048.git --tags')
