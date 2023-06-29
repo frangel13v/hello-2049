@@ -44,18 +44,16 @@ jobs:
             aws ec2 wait instance-running --instance-ids $INSTANCE_ID
   
       - name: Get EC2 instance IP
-        id: get-ip
         run: |
               INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
-              echo "::set-output name=instance_ip::$INSTANCE_IP"
+              echo "INSTANCE_IP=$INSTANCE_IP" >> $GITHUB_ENV
           
       - name: Comment IP address
         uses: peter-evans/commit-comment@v2
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          body: "EC2 instance is available at: http://${{ steps.get-ip.outputs.instance_ip }}:80"
-            
-            
-            
+          body: "EC2 instance is available at: http://$INSTANCE_IP:80"
           
-          
+      - name: Echo IP address
+        run: | 
+          echo "EC2 instance is available at: http://$INSTANCE_IP:80"
