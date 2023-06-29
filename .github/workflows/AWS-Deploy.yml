@@ -21,57 +21,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.PERSONAL_ACCESS_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
       - name: Build and push Docker image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t ghcr.io/2000ghz/hello-2048/hello-2048:latest .
           docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest
 
-      - name: Launch EC2 instance
-        id: launch-ec2
+      - name: Launch EC2 instance from launch template
         run: |
-                USER_DATA=$(base64 <<EOF
-                #!/bin/bash
-                yum update -y
-                sudo yum install docker -y
-                systemctl start docker
-                systemctl enable docker
-                usermod -a -G docker ec2-user
-                if ! command -v docker &> /dev/null
-                then
-                    echo "Docker could not be installed"
-                    exit 1
-                fi
-                EOF
-                )
-                INSTANCE_ID=$(aws ec2 run-instances \
-                  --image-id ami-05432c5a0f7b1bfd0 \
-                  --instance-type t2.micro \
-                  --security-group-ids sg-003af02b9a759e866 \
-                  --subnet-id subnet-0818b9561675ff47e \
-                  --key-name github-actions \
-                  --user-data "$USER_DATA" \
-                  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hello-2048}]" \
-                  --query "Instances[0].InstanceId" \
-                  --output text)
-                echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
-                aws ec2 wait instance-running --instance-ids $INSTANCE_ID
-        
-        
+          INSTANCE_ID=$(aws ec2 run-instances \
+            --launch-template LaunchTemplateId=lt-0d54503baa0a64beb \
+            --query "Instances[0].InstanceId" \
+            --output text)
+          echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
+          aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+
       - name: Get EC2 instance IP
         run: |
           INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
           echo "INSTANCE_IP=$INSTANCE_IP" >> $GITHUB_ENV
 
-      - name: Check SSH
+      - name: Check EC2 instance status
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         run: |
@@ -85,20 +54,3 @@ jobs:
               sleep 10
             fi
           done
-
-      - name: Copy program to EC2 instance
-        env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-        run: |
-          git clone https://github.com/2000ghz/hello-2048.git
-          echo "$PRIVATE_KEY" > private.pem
-          chmod 600 private.pem
-          scp -o StrictHostKeyChecking=no -i private.pem -r hello-2048 ec2-user@${{ env.INSTANCE_IP }}:/home/ec2-user/
-  
-      - name: Run program on EC2 instance
-        env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-        run: |
-          echo "$PRIVATE_KEY" > private.pem
-          chmod 600 private.pem
-          ssh -o "StrictHostKeyChecking=no" -i private.pem ec2-user@${{ env.INSTANCE_IP }} "docker pull ghcr.io/2000ghz/hello-2048/hello-2048 && docker run -td --rm -p 80:80 ghcr.io/2000ghz/hello-2048/hello-2048"
