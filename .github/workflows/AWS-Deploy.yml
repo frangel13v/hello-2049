@@ -21,36 +21,45 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.PERSONAL_ACCESS_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
       - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t ghcr.io/2000ghz/hello-2048/hello-2048:latest .
           docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest
-
-      - name: Launch EC2 instance from launch template
-        run: |
-          INSTANCE_ID=$(aws ec2 run-instances \
-            --launch-template LaunchTemplateId=lt-0d54503baa0a64beb \
-            --query "Instances[0].InstanceId" \
-            --output text)
-          echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
-          aws ec2 wait instance-running --instance-ids $INSTANCE_ID
-
+      
+          - name: Launch EC2 instance from launch template
+          run: |
+            INSTANCE_ID=$(aws ec2 run-instances \
+              --launch-template LaunchTemplateId=lt-0d54503baa0a64beb \
+              --query "Instances[0].InstanceId" \
+              --output text)
+            echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
+            aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+  
       - name: Get EC2 instance IP
         run: |
-          INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
-          echo "INSTANCE_IP=$INSTANCE_IP" >> $GITHUB_ENV
-
+            INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+            echo "INSTANCE_IP=$INSTANCE_IP" >> $GITHUB_ENV
+  
       - name: Check EC2 instance status
         env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+            PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         run: |
-          echo "$PRIVATE_KEY" > private.pem
-          chmod 600 private.pem
-          for i in {1..30}; do
-            if ssh -o "StrictHostKeyChecking=no" -i private.pem ec2-user@${{ env.INSTANCE_IP }} echo "SSH connection successful"; then
-              break
-            else
-              echo "SSH not ready, retrying in 10 seconds..."
-              sleep 10
-            fi
-          done
+            echo "$PRIVATE_KEY" > private.pem
+            chmod 600 private.pem
+            for i in {1..30}; do
+              if ssh -o "StrictHostKeyChecking=no" -i private.pem ec2-user@${{ env.INSTANCE_IP }} echo "SSH connection successful"; then
+                break
+              else
+                echo "SSH not ready, retrying in 10 seconds..."
+                sleep 10
+              fi
+            done
