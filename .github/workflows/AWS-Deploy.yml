@@ -53,7 +53,7 @@ jobs:
         uses: peter-evans/commit-comment@v2
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          body: "EC2 instance is available at: http://${{ steps.get-ip.outputs.instance_ip }}:8080"
+          body: "EC2 instance is available at: http://${{ steps.get-ip.outputs.instance_ip }}:80"
             
             
             
