@@ -42,8 +42,8 @@ jobs:
             --instance-type t2.micro \
             --security-group-ids sg-0929342213735a16c \
             --subnet-id subnet-0818b9561675ff47e \
-            --key-name my-key-pair \
-            --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=my-instance}]" \
+            --key-name github-actions \
+            --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hello-2048}]" \
             --query "Instances[0].InstanceId" \
             --output text)
           aws ec2 wait instance-running --instance-ids $INSTANCE_ID
