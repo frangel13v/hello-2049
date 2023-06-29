@@ -60,7 +60,7 @@ jobs:
               body: `EC2 instance is available at: http://${{ steps.get-ip.outputs.instance_ip }}:8080`
               })
         env:
-            GITHUB_TOKEN: ${{secrets.PERSONAL_ACCESS_TOKEN}}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
           
           
