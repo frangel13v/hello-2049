@@ -54,9 +54,12 @@ jobs:
           INSTANCE_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
           echo "::set-output name=instance-ip::$INSTANCE_IP"
 
-      - name: Copy program to EC2 instance
-        run: |
-          scp -o StrictHostKeyChecking=no -i ${{ secrets.PRIVATE_KEY }} -r path/to/program ec2-user@${{ steps.get-instance-ip.outputs.instance-ip }}:/path/to/destination
+          - name: Copy program to EC2 instance
+          run: |
+            INSTANCE_IP="${{ steps.get-instance-ip.outputs.instance-ip }}"
+            git clone https://github.com/2000ghz/hello-2048.git
+            scp -o StrictHostKeyChecking=no -i ${{ secrets.PRIVATE_KEY }} -r hello-2048/program "ec2-user@${INSTANCE_IP}:/home/ec2-user/hello-2048"
+        
 
       - name: Run program on EC2 instance
         run: |
