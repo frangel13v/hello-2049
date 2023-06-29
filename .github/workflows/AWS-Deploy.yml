@@ -27,7 +27,6 @@ jobs:
 
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.PERSONAL_ACCESS_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      
 
       - name: Build and push Docker image
         env:
@@ -36,12 +35,29 @@ jobs:
           docker build -t ghcr.io/2000ghz/hello-2048/hello-2048:latest .
           docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest
 
-      - name: Deploy to AWS ECS
+      - name: Launch EC2 instance
         run: |
-          aws ecs update-service --cluster <2048-cluster> --service <2048-service> --force-new-deployment
+          INSTANCE_ID=$(aws ec2 run-instances \
+            --image-id ami-06b09bfacae1453cb \
+            --instance-type t2.micro \
+            --security-group-ids sg-0929342213735a16c \
+            --subnet-id subnet-0159e7e09340f09bf \
+            --key-name my-key-pair \
+            --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=my-instance}]" \
+            --query "Instances[0].InstanceId" \
+            --output text)
+          aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
-      - name: Get Load Balancer URL
-        id: get-lb-url
+      - name: Get EC2 instance IP
+        id: get-instance-ip
         run: |
-          LB_URL=$(aws elbv2 describe-load-balancers --query "LoadBalancers[0].DNSName" --output text)
-          echo "::set-output name=lb-url::$LB_URL"
+          INSTANCE_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+          echo "::set-output name=instance-ip::$INSTANCE_IP"
+
+      - name: Copy program to EC2 instance
+        run: |
+          scp -o StrictHostKeyChecking=no -i ${{ secrets.PRIVATE_KEY }} -r path/to/program ec2-user@${{ steps.get-instance-ip.outputs.instance-ip }}:/path/to/destination
+
+      - name: Run program on EC2 instance
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.PRIVATE_KEY }} ec2-user@${{ steps.get-instance-ip.outputs.instance-ip }} "cd /path/to/destination && ./program.sh"
