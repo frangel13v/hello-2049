@@ -31,7 +31,7 @@ jobs:
         run: |
           docker build -t ghcr.io/2000ghz/hello-2048/hello-2048:latest .
           docker tag ghcr.io/2000ghz/hello-2048/hello-2048:latest $ECR_REGISTRY/hello-2048:latest
-          docker push $ECR_REGISTRY/hello-2048:latest
+          docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest
 
       - name: Deploy to AWS ECS
         run: |
