@@ -41,7 +41,7 @@ jobs:
           INSTANCE_ID=$(aws ec2 run-instances \
             --image-id ami-05432c5a0f7b1bfd0 \
             --instance-type t2.micro \
-            --security-group-ids sg-0929342213735a16c \
+            --security-group-ids sg-003af02b9a759e866 \
             --subnet-id subnet-0818b9561675ff47e \
             --key-name github-actions \
             --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hello-2048}]" \
