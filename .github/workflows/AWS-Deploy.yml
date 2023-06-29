@@ -25,12 +25,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
       - name: Build and push Docker image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t ghcr.io/2000ghz/hello-2048/hello-2048:latest .
-          docker tag ghcr.io/2000ghz/hello-2048/hello-2048:latest $ECR_REGISTRY/hello-2048:latest
           docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest
 
       - name: Deploy to AWS ECS
