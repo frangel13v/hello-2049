@@ -26,7 +26,8 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.PERSONAL_ACCESS_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      
 
       - name: Build and push Docker image
         env:
