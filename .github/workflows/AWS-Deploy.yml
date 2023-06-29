@@ -51,8 +51,8 @@ jobs:
       - name: Get EC2 instance IP
         id: get-instance-ip
         run: |
-            INSTANCE_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
-            echo "INSTANCE_IP=${INSTANCE_IP}" >> $GITHUB_ENV
+            echo "INSTANCE_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)" >> $GITHUB_ENV
+        
 
       - name: Copy program to EC2 instance
         run: |
