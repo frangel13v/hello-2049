@@ -36,6 +36,7 @@ jobs:
           docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest
 
       - name: Launch EC2 instance
+        id: launch-ec2
         run: |
           INSTANCE_ID=$(aws ec2 run-instances \
             --image-id ami-05432c5a0f7b1bfd0 \
@@ -46,25 +47,23 @@ jobs:
             --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hello-2048}]" \
             --query "Instances[0].InstanceId" \
             --output text)
+          echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
           aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
       - name: Get EC2 instance IP
-        id: get-instance-ip
         run: |
-            echo "INSTANCE_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)" >> $GITHUB_ENV
-        
+          INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+          echo "INSTANCE_IP=$INSTANCE_IP" >> $GITHUB_ENV
 
       - name: Copy program to EC2 instance
         run: |
-              INSTANCE_IP="${{ env.INSTANCE_IP }}"
-              git clone https://github.com/2000ghz/hello-2048.git
-              scp -o StrictHostKeyChecking=no -i ${{ secrets.PRIVATE_KEY }} -r hello-2048/program "ec2-user@${INSTANCE_IP}:/home/ec2-user/hello-2048"
-          
-        
+          git clone https://github.com/2000ghz/hello-2048.git
+          scp -o StrictHostKeyChecking=no -i ${{ secrets.PRIVATE_KEY_PATH }} -r hello-2048/program "ec2-user@${{ env.INSTANCE_IP }}:/home/ec2-user/hello-2048"
 
       - name: Run program on EC2 instance
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         run: |
-            echo "${{ secrets.PRIVATE_KEY }}" > private-key.pem
+            echo "${PRIVATE_KEY}" > private-key.pem
             chmod 400 private-key.pem
-            ssh -o "StrictHostKeyChecking=no" -i private-key.pem ec2-user@${{ steps.get-instance-ip.outputs.instance-ip }} "docker pull ghcr.io/2000ghz/hello-2048/hello-2048 && docker run -td --rm -p 80:80 ghcr.io/2000ghz/hello-2048/hello-2048"
-        
+            ssh -o "StrictHostKeyChecking=no" -i private-key.pem ec2-user@${{ env.INSTANCE_IP }} "docker pull ghcr.io/2000ghz/hello-2048/hello-2048 && docker run -td --rm -p 80:80 ghcr.io/2000ghz/hello-2048/hello-2048"
