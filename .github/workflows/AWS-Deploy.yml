@@ -50,17 +50,11 @@ jobs:
               echo "::set-output name=instance_ip::$INSTANCE_IP"
           
       - name: Comment IP address
-        uses: actions/github-script@v5
+        uses: peter-evans/commit-comment@v2
         with:
-          script: |
-            github.rest.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
-              body: `EC2 instance is available at: http://${{ steps.get-ip.outputs.instance_ip }}:8080`
-              })
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+              body: EC2 instance is available at: http://${{ steps.get-ip.outputs.instance_ip }}:80
+            
             
           
           
