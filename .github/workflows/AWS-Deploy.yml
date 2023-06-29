@@ -35,8 +35,8 @@ jobs:
           docker build -t ghcr.io/2000ghz/hello-2048/hello-2048:latest .
           docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest
       
-          - name: Launch EC2 instance from launch template
-          run: |
+      - name: Launch EC2 instance from launch template
+        run: |
             INSTANCE_ID=$(aws ec2 run-instances \
               --launch-template LaunchTemplateId=lt-0d54503baa0a64beb \
               --query "Instances[0].InstanceId" \
