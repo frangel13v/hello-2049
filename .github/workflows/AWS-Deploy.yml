@@ -41,7 +41,7 @@ jobs:
             --image-id ami-05432c5a0f7b1bfd0 \
             --instance-type t2.micro \
             --security-group-ids sg-0929342213735a16c \
-            --subnet-id subnet-0159e7e09340f09bf \
+            --subnet-id subnet-0818b9561675ff47e \
             --key-name my-key-pair \
             --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=my-instance}]" \
             --query "Instances[0].InstanceId" \
