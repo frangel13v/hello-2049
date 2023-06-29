@@ -38,30 +38,28 @@ jobs:
       - name: Launch EC2 instance
         id: launch-ec2
         run: |
-              USER_DATA=$(base64 <<EOF
-              #!/bin/bash
-              yum update -y
-              amazon-linux-extras install docker -y
-              systemctl start docker
-              systemctl enable docker
-              usermod -a -G docker ec2-user
-              EOF
-              )
-              INSTANCE_ID=$(aws ec2 run-instances \
-                --image-id ami-05432c5a0f7b1bfd0 \
-                --instance-type t2.micro \
-                --security-group-ids sg-003af02b9a759e866 \
-                --subnet-id subnet-0818b9561675ff47e \
-                --key-name github-actions \
-                --user-data "$USER_DATA" \
-                --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hello-2048}]" \
-                --query "Instances[0].InstanceId" \
-                --output text)
-              echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
-              aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+                USER_DATA=$(base64 <<EOF
+                #!/bin/bash
+                yum update -y
+                amazon-linux-extras install -y docker
+                service docker start
+                systemctl enable docker
+                usermod -a -G docker ec2-user
+                EOF
+                )
+                INSTANCE_ID=$(aws ec2 run-instances \
+                  --image-id ami-05432c5a0f7b1bfd0 \
+                  --instance-type t2.micro \
+                  --security-group-ids sg-003af02b9a759e866 \
+                  --subnet-id subnet-0818b9561675ff47e \
+                  --key-name github-actions \
+                  --user-data "$USER_DATA" \
+                  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hello-2048}]" \
+                  --query "Instances[0].InstanceId" \
+                  --output text)
+                echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
+                aws ec2 wait instance-running --instance-ids $INSTANCE_ID
         
-        
-
       - name: Get EC2 instance IP
         run: |
           INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
