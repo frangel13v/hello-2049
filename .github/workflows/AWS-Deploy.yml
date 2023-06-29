@@ -43,21 +43,23 @@ jobs:
             echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
             aws ec2 wait instance-running --instance-ids $INSTANCE_ID
   
-      - name: Comment commit with public IP
+      - name: Get EC2 instance IP
+        id: get-ip
         run: |
-            INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
-            echo "INSTANCE_IP=$INSTANCE_IP" >> $GITHUB_ENV
-
-            - name: Comment IP address
-            uses: actions/github-script@v5
-            with:
-              script: |
-                github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: 'EC2 instance is available at: http://${{ env.INSTANCE_IP }}:8080'
-                })
-            env:
-              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+              INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+              echo "::set-output name=instance_ip::$INSTANCE_IP"
+          
+      - name: Comment IP address
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `EC2 instance is available at: http://${{ steps.get-ip.outputs.instance_ip }}:8080`
+            })
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          
           
