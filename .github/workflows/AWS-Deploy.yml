@@ -48,18 +48,3 @@ jobs:
         run: |
             INSTANCE_IP=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
             echo "INSTANCE_IP=$INSTANCE_IP" >> $GITHUB_ENV
-  
-      - name: Check EC2 instance status
-        env:
-            PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-        run: |
-            echo "$PRIVATE_KEY" > private.pem
-            chmod 600 private.pem
-            for i in {1..30}; do
-              if ssh -o "StrictHostKeyChecking=no" -i private.pem ec2-user@${{ env.INSTANCE_IP }} echo "SSH connection successful"; then
-                break
-              else
-                echo "SSH not ready, retrying in 10 seconds..."
-                sleep 10
-              fi
-            done
