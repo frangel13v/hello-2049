@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - master
+    pull_request:
+      - main
+      - master
 
 jobs:
   Deploy-to-AWS:
@@ -52,9 +55,13 @@ jobs:
         uses: peter-evans/commit-comment@v2
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          body: "EC2 instance is available at: http://${{ env.INSTANCE_IP }}:80"
+          body: "EC2 instance is available at: http://${{ env.INSTANCE_IP }}"
             
           
       - name: Echo IP address
         run: | 
-          echo "EC2 instance is available at: http://$INSTANCE_IP:80"
+          echo "EC2 instance is available at: http://$INSTANCE_IP"
+
+# IMPORTANT INFORMATION
+# The template for this deployment is 'lt-0d54503baa0a64beb'
+# It configures an EC2 instance and, using the 'User Data' in it, installs dependencies, and runs the project.
