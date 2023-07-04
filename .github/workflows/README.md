@@ -1,4 +1,4 @@
-# Deploy to AWS
+# AWS-Deploy
 
 This workflow deploys a Docker image to AWS and launches an EC2 instance making use of a preconfigured launch template. It also retrieves the public IP address of the EC2 instance and comments the IP address in a commit on GitHub.
 
