@@ -5,9 +5,11 @@ on:
     branches:
       - main
       - master
+      - Trabajo_Conjunto
     pull_request:
       - main
       - master
+      - Trabajo_Conjunto
 
 jobs:
   Deploy-to-AWS:
@@ -15,14 +17,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.PERSONAL_ACCESS_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build and push Docker image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build -t ghcr.io/2000ghz/hello-2048/hello-2048:latest .
           docker push ghcr.io/2000ghz/hello-2048/hello-2048:latest
@@ -35,14 +35,10 @@ jobs:
           aws-region: eu-west-1
         env:
           AWS_AUDIENCE: sts.amazonaws.com
-           
-      
+         
       - name: Launch EC2 instance from launch template
         run: |
-            INSTANCE_ID=$(aws ec2 run-instances \
-              --launch-template LaunchTemplateId=lt-0d54503baa0a64beb \
-              --query "Instances[0].InstanceId" \
-              --output text)
+            aws ec2 run-instances --launch-template LaunchTemplateId=lt-0d54503baa0a64beb 
             echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
             aws ec2 wait instance-running --instance-ids $INSTANCE_ID
   
