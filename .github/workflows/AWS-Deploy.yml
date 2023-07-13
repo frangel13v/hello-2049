@@ -5,9 +5,11 @@ on:
     branches:
       - main
       - master
+      - trabajo
     pull_request:
       - main
       - master
+      - trabajo
 
 jobs:
   Deploy-to-AWS:
@@ -65,3 +67,4 @@ jobs:
 # IMPORTANT INFORMATION
 # The template for this deployment is 'lt-0d54503baa0a64beb'
 # It configures an EC2 instance and, using the 'User Data' in it, installs dependencies, and runs the project.
+# Comment.
